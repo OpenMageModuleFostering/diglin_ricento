@@ -1,0 +1,49 @@
+<?php
+/**
+ * Diglin GmbH - Switzerland
+ *
+ * @author Sylvain Rayé <sylvain.raye at diglin.com>
+ * @category    Diglin
+ * @package     Diglin_Ricento
+ * @copyright   Copyright (c) 2011-2015 Diglin (http://www.diglin.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+$incrementValidationMessage = $this->getErrorMessage();
+$jsonAllowedCombinations = $this->getJsonAllowedCombinations();
+?>
+<script type="text/javascript">
+Validation.addAllThese([
+    ['validate-startprice-increment', '<?php echo $incrementValidationMessage ?>', function(fieldValue, field) {
+
+        if ($('fieldset_toggle_auction').getStyle('display') == 'none') {
+            return true;
+        }
+
+        startPriceValue = $('sales_options_sales_auction_start_price').value;
+
+        allowedCombinations = <?php echo $jsonAllowedCombinations ?>;
+        for (i = 0; i < allowedCombinations.length; ++i) {
+            if (allowedCombinations[i].start_price.min <= startPriceValue && allowedCombinations[i].start_price.max >= startPriceValue ) {
+                if (allowedCombinations[i].increment.min <= fieldValue && allowedCombinations[i].increment.max >= fieldValue) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }],
+    ['validate-ricardo-category', '<?php echo $this->__('You must select a ricardo.ch Category if you set this option'); ?>', function(fieldValue) {
+
+        var useMappingValue = Form.getInputs('edit_form','radio','sales_options[ricardo_category_use_mapping]').find(function(radio) {
+            return radio.checked;
+        }).value;
+
+        fieldValue = $('sales_options_ricardo_category').value;
+
+        if (useMappingValue == 0 && fieldValue <= 0) {
+            return false;
+        }
+
+        return true;
+    }]
+]);
+</script>

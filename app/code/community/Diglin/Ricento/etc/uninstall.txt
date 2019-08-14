@@ -1,0 +1,18 @@
+src/app/etc/modules/Diglin_Ricento.xml app/etc/modules/Diglin_Ricento.xml
+src/app/code/community/Diglin/Ricento app/code/community/Diglin/Ricento
+src/app/design/adminhtml/default/default/layout/ricento.xml app/design/adminhtml/default/default/layout/ricento.xml
+src/app/design/adminhtml/default/default/template/ricento app/design/adminhtml/default/default/template/ricento
+src/skin/adminhtml/default/default/ricento skin/adminhtml/default/default/ricento
+src/js/ricento js/ricento
+
+src/app/locale/en_US/Diglin_Ricento.csv app/locale/en_US/Diglin_Ricento.csv
+src/app/locale/en_US/template/email/ricento app/locale/en_US/template/email/ricento
+
+src/app/locale/fr_FR/Diglin_Ricento.csv app/locale/fr_FR/Diglin_Ricento.csv
+src/app/locale/fr_FR/template/email/ricento app/locale/fr_FR/template/email/ricento
+
+src/app/locale/de_CH/Diglin_Ricento.csv app/locale/de_CH/Diglin_Ricento.csv
+src/app/locale/de_CH/template/email/ricento app/locale/de_CH/template/email/ricento
+
+src/app/locale/de_DE/Diglin_Ricento.csv app/locale/de_DE/Diglin_Ricento.csv
+src/app/locale/de_DE/template/email/ricento app/locale/de_DE/template/email/ricento

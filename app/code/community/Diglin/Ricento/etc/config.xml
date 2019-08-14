@@ -1,0 +1,374 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Diglin GmbH - Switzerland
+ *
+ * @author      Sylvain Rayé <support at diglin.com>
+ * @category    Diglin
+ * @package     Diglin_Ricento
+ * @copyright   Copyright (c) 2011-2015 Diglin (http://www.diglin.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config>
+    <modules>
+        <Diglin_Ricento>
+            <version>1.0.13</version>
+        </Diglin_Ricento>
+    </modules>
+
+    <default>
+        <system>
+            <messages>
+                <notification_email_template>system_admin_notification_email_template</notification_email_template>
+                <pm_email_template>customer_private_message_email_template</pm_email_template>
+            </messages>
+        </system>
+
+        <ricento>
+            <global>
+                <merge_order>1</merge_order>
+                <decrease_inventory>0</decrease_inventory>
+                <shipping_calculation>cumulative</shipping_calculation>
+                <email_account_creation>0</email_account_creation>
+                <email_order_creation>0</email_order_creation>
+            </global>
+            <api_config>
+                <enabled>1</enabled>
+                <dev_mode>1</dev_mode>
+                <debug>0</debug>
+                <assistant_url>https://assistant.ricardo.ch</assistant_url>
+                <assistant_url_dev>https://ra.betaqxl.com/</assistant_url_dev>
+                <signup_url>http://www.ricardo.ch/interface/en-us/application.aspx</signup_url>
+                <simulate_authorization>0</simulate_authorization>
+                <email_notification>1</email_notification>
+                <!-- it's only possible one day before to renew the API token -->
+                <expiration_notification_delay>1</expiration_notification_delay>
+                <host>ws.ricardo.ch</host>
+                <host_dev>ws.betaqxl.com</host_dev>
+                <lang>de,fr</lang>
+            </api_config>
+            <cleanup_jobs>
+                <enabled>1</enabled>
+                <keep_days>30</keep_days>
+            </cleanup_jobs>
+            <rss>
+                <news_count>4</news_count>
+                <news_feed_de>http://www.ricardo.ch/verkauferportal/de-ch/news.aspx?view=rss</news_feed_de>
+                <news_feed_fr>http://www.fr.ricardo.ch/portail-vendeur/fr-ch/actualit%C3%A9s.aspx?view=rss</news_feed_fr>
+            </rss>
+        </ricento>
+
+        <payment>
+            <ricento translate="title" module="diglin_ricento">
+                <active>1</active>
+                <model>diglin_ricento/sales_method_payment</model>
+                <title>ricardo.ch Payment Methods</title>
+                <allowspecific>0</allowspecific>
+                <sort_order>999</sort_order>
+            </ricento>
+        </payment>
+
+        <carriers>
+            <ricento translate="title" module="diglin_ricento">
+                <active>1</active>
+                <model>diglin_ricento/sales_method_shipping</model>
+                <title>ricardo.ch Shipping</title>
+                <sort_order>999</sort_order>
+                <sallowspecific>0</sallowspecific>
+                <showmethod>0</showmethod>
+            </ricento>
+        </carriers>
+    </default>
+
+    <global>
+        <psr0_namespaces>
+            <!-- Required to load the Ricardo PHP library -->
+            <Diglin_Ricardo />
+        </psr0_namespaces>
+
+        <phpunit>
+            <suite>
+                <modules>
+                    <Diglin_Ricento />
+                </modules>
+            </suite>
+        </phpunit>
+
+        <cache>
+            <types>
+                <ricardo_api translate="label,description" module="diglin_ricento">
+                    <label>ricardo.ch API</label>
+                    <description><![CDATA[Cache ricardo.ch API content (category, system info, payment & shipping info, etc) when called.]]></description>
+                    <tags>RICARDO_API</tags>
+                </ricardo_api>
+            </types>
+        </cache>
+
+        <models>
+            <diglin_ricento>
+                <class>Diglin_Ricento_Model</class>
+                <resourceModel>diglin_ricento_resource</resourceModel>
+            </diglin_ricento>
+            <diglin_ricento_resource>
+                <class>Diglin_Ricento_Model_Resource</class>
+                <entities>
+                    <products_listing>
+                        <table>ricento_products_listing</table>
+                    </products_listing>
+                    <products_listing_item>
+                        <table>ricento_products_listing_item</table>
+                    </products_listing_item>
+                    <sales_options>
+                        <table>ricento_sales_options</table>
+                    </sales_options>
+                    <api_token>
+                        <table>ricento_api_token</table>
+                    </api_token>
+                    <sync_job>
+                        <table>ricento_sync_job</table>
+                    </sync_job>
+                    <sync_job_listing>
+                        <table>ricento_sync_job_listing</table>
+                    </sync_job_listing>
+                    <listing_log>
+                        <table>ricento_products_listing_log</table>
+                    </listing_log>
+                    <shipping_payment_rule>
+                        <table>ricento_shipping_payment_rule</table>
+                    </shipping_payment_rule>
+                    <sales_transaction>
+                        <table>ricento_sales_transaction</table>
+                    </sales_transaction>
+                </entities>
+            </diglin_ricento_resource>
+        </models>
+
+        <blocks>
+            <diglin_ricento>
+                <class>Diglin_Ricento_Block</class>
+            </diglin_ricento>
+        </blocks>
+
+        <helpers>
+            <diglin_ricento>
+                <class>Diglin_Ricento_Helper</class>
+            </diglin_ricento>
+        </helpers>
+
+        <resources>
+            <ricento_setup>
+                <setup>
+                    <module>Diglin_Ricento</module>
+                    <class>Mage_Catalog_Model_Resource_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </ricento_setup>
+
+            <ricento_resource_read>
+                <connection>core_read</connection>
+            </ricento_resource_read>
+
+            <ricento_resource_write>
+                <connection>core_write</connection>
+            </ricento_resource_write>
+        </resources>
+
+        <events>
+            <resource_get_tablename>
+                <observers>
+                    <diglin_ricento>
+                        <type>singleton</type>
+                        <class>diglin_ricento/observer</class>
+                        <method>addAutoloader</method>
+                    </diglin_ricento>
+                </observers>
+            </resource_get_tablename>
+
+            <add_spl_autoloader>
+                <observers>
+                    <diglin_ricento>
+                        <type>singleton</type>
+                        <class>diglin_ricento/observer</class>
+                        <method>addAutoloader</method>
+                    </diglin_ricento>
+                </observers>
+            </add_spl_autoloader>
+
+            <!--<sales_order_item_save_commit_after>-->
+            <!--<observers>-->
+            <!--<ricento_qty_decrease>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>diglin_ricento/observer</class>-->
+            <!--<method>decreaseInventory</method>-->
+            <!--</ricento_qty_decrease>-->
+                <!--</observers>-->
+            <!--</sales_order_item_save_commit_after>-->
+
+            <payment_info_block_prepare_specific_information>
+                <observers>
+                    <ricento_payment_info>
+                        <class>diglin_ricento/observer</class>
+                        <method>paymentMethodsInformation</method>
+                    </ricento_payment_info>
+                </observers>
+            </payment_info_block_prepare_specific_information>
+
+            <sales_quote_item_set_product>
+                <observers>
+                    <ricento_quote_item>
+                        <class>diglin_ricento/observer</class>
+                        <method>setSkipppedRequiredOption</method>
+                    </ricento_quote_item>
+                </observers>
+            </sales_quote_item_set_product>
+        </events>
+
+        <ricento>
+            <allow_product_types>
+                <simple />
+                <configurable />
+                <grouped />
+            </allow_product_types>
+
+            <dispatcher>
+                <types>
+                    <check_list>
+                        <class>Diglin_Ricento_Model_Dispatcher_Check_List</class>
+                    </check_list>
+                    <sync_list>
+                        <class>Diglin_Ricento_Model_Dispatcher_Sync_List</class>
+                    </sync_list>
+                    <list>
+                        <class>Diglin_Ricento_Model_Dispatcher_List</class>
+                    </list>
+                    <order>
+                        <class>Diglin_Ricento_Model_Dispatcher_Order</class>
+                    </order>
+                    <relist>
+                        <class>Diglin_Ricento_Model_Dispatcher_Relist</class>
+                    </relist>
+                    <stop>
+                        <class>Diglin_Ricento_Model_Dispatcher_Stop</class>
+                    </stop>
+                </types>
+            </dispatcher>
+        </ricento>
+
+        <template>
+            <email>
+                <system_admin_notification_email_template translate="label" module="diglin_ricento">
+                    <label>Admin Email Notification</label>
+                    <file>ricento/admin_message.html</file>
+                    <type>text</type>
+                </system_admin_notification_email_template>
+                <customer_private_message_email_template translate="label" module="diglin_ricento">
+                    <label>Private message</label>
+                    <file>ricento/private_message.html</file>
+                    <type>html</type>
+                </customer_private_message_email_template>
+            </email>
+        </template>
+
+        <fieldsets>
+            <sales_convert_quote>
+                <is_ricardo>
+                    <to_order>*</to_order>
+                </is_ricardo>
+                <customer_ricardo_username>
+                    <to_order>*</to_order>
+                </customer_ricardo_username>
+                <customer_ricardo_id>
+                    <to_order>*</to_order>
+                </customer_ricardo_id>
+            </sales_convert_quote>
+        </fieldsets>
+    </global>
+
+    <adminhtml>
+        <layout>
+            <updates>
+                <diglin_ricento>
+                    <file>ricento.xml</file>
+                </diglin_ricento>
+            </updates>
+            <jstranslate>
+                <file>jstranslator.xml</file>
+            </jstranslate>
+        </layout>
+        <translate>
+            <modules>
+                <diglin_ricento>
+                    <files>
+                        <default>Diglin_Ricento.csv</default>
+                    </files>
+                </diglin_ricento>
+            </modules>
+        </translate>
+
+        <events>
+            <adminhtml_block_html_before>
+                <observers>
+                    <ricardo_customer_fields>
+                        <class>Diglin_Ricento_Model_Observer</class>
+                        <method>disableFormField</method>
+                    </ricardo_customer_fields>
+                </observers>
+            </adminhtml_block_html_before>
+        </events>
+    </adminhtml>
+
+    <admin>
+        <routers>
+            <ricento>
+                <use>admin</use>
+                <args>
+                    <module>Diglin_Ricento</module>
+                    <frontName>ricento</frontName>
+                    <modules>
+                        <diglin_ricento before="Mage_Adminhtml">Diglin_Ricento_Adminhtml</diglin_ricento>
+                    </modules>
+                </args>
+            </ricento>
+        </routers>
+    </admin>
+
+    <frontend>
+        <translate>
+            <modules>
+                <diglin_ricento>
+                    <files>
+                        <default>Diglin_Ricento.csv</default>
+                    </files>
+                </diglin_ricento>
+            </modules>
+        </translate>
+    </frontend>
+
+    <crontab>
+        <jobs>
+            <ricento_sync_jobs>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>diglin_ricento/cron::process</model>
+                </run>
+            </ricento_sync_jobs>
+            <ricento_async_jobs>
+                <schedule>
+                    <cron_expr>*/10 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>diglin_ricento/cron::async</model>
+                </run>
+            </ricento_async_jobs>
+        </jobs>
+    </crontab>
+
+    <uninstall>
+        <filename>uninstall.txt</filename>
+    </uninstall>
+</config>

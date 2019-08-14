@@ -1,0 +1,30 @@
+<?php
+/**
+ * Diglin GmbH - Switzerland
+ *
+ * @author Sylvain Rayé <sylvain.raye at diglin.com>
+ * @category    Diglin
+ * @package     Diglin_Ricento
+ * @copyright   Copyright (c) 2011-2015 Diglin (http://www.diglin.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+/** @var $this Diglin_Ricento_Block_Adminhtml_Dashboard_Turnover */
+?>
+<div style="margin:20px;">
+    <?php if (Mage::getStoreConfig(Mage_Adminhtml_Block_Dashboard::XML_PATH_ENABLE_CHARTS)) { ?>
+        <?php
+        $_containerStyle = "width:{$this->getWidth()}px;height:{$this->getHeight()}px; margin:0 auto;";
+        ?>
+        <?php if($this->getCount()): ?>
+            <p style="<?php echo $_containerStyle?>"><img src="<?php echo $this->getChartUrl(false) ?>" alt="<?php echo $this->__('ricardo.ch Turnover Chart'); ?>" title="<?php echo $this->__('ricardo.ch Turnover Chart'); ?>" /></p>
+        <?php else: ?>
+            <p class="a-center" style="<?php echo $_containerStyle?>"><?php echo $this->__('No Data Found') ?></p>
+        <?php endif; ?>
+    <?php } else { ?>
+    <div class="box" style="margin:20px;">
+        <p class="a-center">
+            <?php echo $this->helper('adminhtml')->__('Chart is disabled. If you want to enable chart, click <a href="%s">here</a>.', $this->getUrl('adminhtml/system_config/edit', array('section'=>'admin')))?>
+        </p>
+    </div>
+    <?php } ?>
+</div>

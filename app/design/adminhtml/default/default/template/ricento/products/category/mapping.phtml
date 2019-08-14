@@ -1,0 +1,40 @@
+<?php
+/**
+ * Diglin GmbH - Switzerland
+ *
+ * @author      Sylvain Rayé <sylvain.raye at diglin.com>
+ * @category    Diglin
+ * @package     Diglin_Ricento
+ * @copyright   Copyright (c) 2011-2015 Diglin (http://www.diglin.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+/* @var $this Diglin_Ricento_Block_Adminhtml_Products_Category_Mapping */
+?>
+<div id="ricardo_categories" <?php if ($this->shouldResize()): ?>class="ricardo_categories_resized"<?php endif; ?>>
+<form action="#" onsubmit="categoryMapper.submitForm(this); return false;">
+    <div class="form-buttons">
+        <button type="button" onclick="Ricento.closePopup()" class="cancel button" id="ricardo_categories_button_cancel"><span><?php echo $this->__('Cancel'); ?></span></button>
+        <button type="submit" class="save button" id="ricardo_categories_button_save"><span><?php echo $this->__('Confirm');?></span></button>
+    </div>
+<?php
+    echo $this->getChildHtml('toplevel');
+?>
+    <div id="ricardo_children">
+<?php
+    echo $this->getChildHtml('sublevel');
+?>
+    </div>
+    <input type="hidden" name="ricardo_category_selected_title" id="ricardo_category_selected_title" value="" />
+    <div class="form-buttons">
+        <button type="button" onclick="Ricento.closePopup()" class="cancel button" id="ricardo_categories_button_cancel"><span><?php echo $this->__('Cancel'); ?></span></button>
+        <button type="submit" class="save button" id="ricardo_categories_button_save"><span><?php echo $this->__('Confirm');?></span></button>
+    </div>
+</form>
+</div>
+
+<script type="text/javascript">
+    categoryMapper = new Ricento.CategoryMappper({
+        wrapperElement : 'ricardo_categories',
+        loadChildrenUrl : '<?php echo $this->getUrl('ricento/products_category/children', array('id' => '#ID#', 'level' => '#LVL#')); ?>'
+    });
+</script>
