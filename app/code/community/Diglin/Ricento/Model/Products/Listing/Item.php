@@ -160,15 +160,6 @@ class Diglin_Ricento_Model_Products_Listing_Item extends Mage_Core_Model_Abstrac
             }
         }
 
-        // Warm picture cache to prevent memory consumption while listing items
-        $images = (array) $this->getProduct()->getImages($this->getBaseProductId());
-
-        foreach ($images as $image) {
-            if (isset($image['filepath'])) {
-                Mage::helper('diglin_ricento/image')->prepareRicardoPicture($image['filepath']);
-            }
-        }
-
         return parent::_afterSave();
     }
 
@@ -561,21 +552,26 @@ class Diglin_Ricento_Model_Products_Listing_Item extends Mage_Core_Model_Abstrac
 
         foreach ($images as $image) {
 
-            $filename = false;
-            if (isset($image['filepath'])) {
-                $filename = Mage::helper('diglin_ricento/image')->prepareRicardoPicture($image['filepath']);
-            }
+            $filename = $image['filepath'];
+//            if (isset($image['filepath'])) {
+//                $filename = Mage::helper('diglin_ricento/image')->prepareRicardoPicture($image['filepath']);
+//            }
+//            if (!$filename) {
+//                continue;
+//            }
 
-            if (!$filename) {
+            if ($filename == 'no_selection') {
                 continue;
             }
+
+            $filename = Mage::helper('diglin_ricento/image')->init(new Mage_Catalog_Model_Product(), 'image', $filename);
 
             if ($i >= 10) { // Do not set more than 10 pictures
                 break;
             };
 
-            $hashImage = md5($image['filepath']);
-            if (!isset($hash[$hashImage])) {
+            $hashImage = md5($filename);
+            if (!isset($hash[$hashImage]) && file_exists($filename)) {
 
                 // Prepare picture to set the content as byte array for the webservice
                 $imageExtension = Helper::getPictureExtension($filename);
@@ -583,9 +579,9 @@ class Diglin_Ricento_Model_Products_Listing_Item extends Mage_Core_Model_Abstrac
                 if ($imageExtension) {
                     $picture = new ArticlePictureParameter();
                     $picture
-//                        ->setPictureInBase64(base64_encode(file_get_contents($filename)))
+                        ->setPictureInBase64(base64_encode(file_get_contents($filename)))
                         // we encode in Json to minimize memory consumption
-                        ->setPictureBytes(json_encode(array_values(unpack('C*', file_get_contents($filename)))))
+//                        ->setPictureBytes(json_encode(array_values(unpack('C*', file_get_contents($filename)))))
                         ->setPictureExtension($imageExtension)
                         ->setPictureIndex(++$i);
 
