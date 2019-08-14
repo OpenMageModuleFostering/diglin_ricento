@@ -59,11 +59,13 @@ class Diglin_Ricento_Helper_Data extends Mage_Core_Helper_Abstract
     const CFG_STATS_APPID                   = 'ricento/global/stats_app_id';
     const CFG_STATS_APPID_TEST              = 'ricento/global/stats_app_id_test';
     const CFG_UPDATE_NOTIFICATION           = 'ricento/global/update_notification';
+    const CFG_IMPORT_TRANSACTION            = 'ricento/global/import_transaction';
 
     /**
      * Listing config
      */
     const CFG_MERGE_DESCRIPTIONS            = 'ricento/listing/merge_descriptions';
+    const CFG_MERGE_ATTRIBUTES              = 'ricento/listing/merge_attributes';
     const CFG_NL2BR                         = 'ricento/listing/nl2br';
     const CFG_WATERMARK_ENABLED             = 'ricento/listing/watermark_enabled';
     const CFG_WATERMARK                     = 'ricento/listing/watermark_image';
@@ -71,6 +73,8 @@ class Diglin_Ricento_Helper_Data extends Mage_Core_Helper_Abstract
     const CFG_WATERMARK_POSITION            = 'ricento/listing/watermark_position';
     const CFG_WATERMARK_SIZE                = 'ricento/listing/watermark_size';
     const CFG_IMAGE_PLACEHOLDER             = 'ricento/listing/placeholder_allowed';
+    const CFG_CONFIGURABLE_PRICE            = 'ricento/listing/configurable_price';
+    const CFG_CONFIGURABLE_PICTURE          = 'ricento/listing/configurable_picture';
 
     /**
      * Cleanup Job config
@@ -769,6 +773,15 @@ class Diglin_Ricento_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @param int $storeId
+     * @return mixed
+     */
+    public function canMergeAttributes($storeId = 0)
+    {
+        return Mage::getStoreConfigFlag(self::CFG_MERGE_ATTRIBUTES, $storeId);
+    }
+
+    /**
      * @param Diglin_Ricento_Model_Products_Listing_Item $item
      * @return int|string
      */
@@ -883,5 +896,41 @@ class Diglin_Ricento_Helper_Data extends Mage_Core_Helper_Abstract
     public function canNotifyUpdate($store = null)
     {
         return Mage::getStoreConfigFlag(self::CFG_UPDATE_NOTIFICATION, $store);
+    }
+
+    /**
+     * @param null $store
+     * @return bool
+     */
+    public function canImportTransaction($store = null)
+    {
+        return Mage::getStoreConfigFlag(self::CFG_IMPORT_TRANSACTION, $store);
+    }
+
+    /**
+     * @param null $store
+     * @return bool
+     */
+    public function useConfigurableSimpleProductPrice($store = null)
+    {
+        return Mage::getStoreConfigFlag(self::CFG_CONFIGURABLE_PRICE, $store);
+    }
+
+    /**
+     * @param null $store
+     * @return bool
+     */
+    public function useConfigurableSimpleProductPicture($store = null)
+    {
+        return Mage::getStoreConfigFlag(self::CFG_CONFIGURABLE_PICTURE, $store);
+    }
+
+    /**
+     * @param null $store
+     * @return bool
+     */
+    public function isNl2BrEnabled($store = null)
+    {
+        return Mage::getStoreConfigFlag(self::CFG_NL2BR, $store);
     }
 }

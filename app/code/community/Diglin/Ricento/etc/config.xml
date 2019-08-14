@@ -13,7 +13,7 @@
 <config>
     <modules>
         <Diglin_Ricento>
-            <version>1.4.1.3</version>
+            <version>1.6.2</version>
         </Diglin_Ricento>
     </modules>
 
@@ -38,10 +38,13 @@
             </adminnotification>
             <listing>
                 <merge_descriptions>0</merge_descriptions>
+                <merge_attributes>0</merge_attributes>
                 <nl2br>0</nl2br>
                 <watermark_enabled>0</watermark_enabled>
                 <watermark_imageOpacity>100</watermark_imageOpacity>
                 <placeholder_allowed>0</placeholder_allowed>
+                <configurable_price>0</configurable_price>
+                <configurable_picture>0</configurable_picture>
             </listing>
             <global>
                 <merge_order>1</merge_order>
@@ -60,6 +63,7 @@
                 <update_notification>1</update_notification>
                 <customer_grid>1</customer_grid>
                 <order_grid>1</order_grid>
+                <import_transaction>1</import_transaction>
             </global>
             <api_config>
                 <enabled>1</enabled>
