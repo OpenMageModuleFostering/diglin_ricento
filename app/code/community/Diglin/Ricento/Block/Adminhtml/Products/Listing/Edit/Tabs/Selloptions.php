@@ -49,7 +49,7 @@ class Diglin_Ricento_Block_Adminhtml_Products_Listing_Edit_Tabs_Selloptions
             'label' => $this->__('ricardo.ch Category'),
             'separator' => ' ',
             'values' => array(
-                array('value' => 1, 'label' => $this->__('Use Magento / ricardo.ch Category mapping (if mapping does not exist, an error message will be triggered while preparing the synchronization to Ricardo)')),
+                array('value' => 1, 'label' => $this->__('Use Magento / ricardo.ch Category mapping (if mapping does not exist, an error message will be triggered while preparing the synchronization to ricardo.ch)')),
                 array('value' => 0, 'label' => $this->__('Select ricardo.ch Category'), 'field' => array(
                     'ricardo_category', 'ricardo_category', array(
                         'name' => 'sales_options[ricardo_category]',
@@ -293,7 +293,7 @@ class Diglin_Ricento_Block_Adminhtml_Products_Listing_Edit_Tabs_Selloptions
             'name' => 'sales_options[customization_template]',
             'label' => $this->__('Template'),
             'values' => Mage::getSingleton('diglin_ricento/config_source_sales_template')->getAllOptions(),
-            'note' => $this->__('To create one go to your <a href="%s">ricardo.ch account</a> into "My Sales".', Diglin_Ricento_Helper_Data::RICARDO_URL)
+            'note' => $this->__('To create one go to your <a onclick="window.open(\'%s\')">ricardo.ch account</a> into "My Sales".', Diglin_Ricento_Helper_Data::RICARDO_URL)
         ));
 
         /**
