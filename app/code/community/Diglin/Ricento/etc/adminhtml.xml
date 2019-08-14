@@ -46,7 +46,7 @@
                     </children>
                 </log>
                 <assistant translate="title" module="diglin_ricento">
-                    <title>ricardo.ch Assistant</title>
+                    <title>ricardoAssistant</title>
                     <action>ricento/account/assistant</action>
                     <sort_order>40</sort_order>
                 </assistant>
@@ -111,6 +111,9 @@
                             <config translate="title" module="diglin_ricento">
                                 <title>Configuration</title>
                             </config>
+                            <support translate="title" module="diglin_ricento">
+                                <title>Support</title>
+                            </support>
                         </children>
                     </ricento>
                 </children>
