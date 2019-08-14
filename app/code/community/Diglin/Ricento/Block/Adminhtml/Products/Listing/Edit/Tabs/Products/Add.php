@@ -5,7 +5,7 @@
  * @author      Sylvain Rayé <support at diglin.com>
  * @category    Diglin
  * @package     Diglin_Ricento
- * @copyright   Copyright (c) 2014 ricardo.ch AG (http://www.ricardo.ch)
+ * @copyright   Copyright (c) 2015 ricardo.ch AG (http://www.ricardo.ch)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -51,12 +51,16 @@ class Diglin_Ricento_Block_Adminhtml_Products_Listing_Edit_Tabs_Products_Add
         if ($this->getListing()->getId()) {
             $this->setDefaultFilter(array('in_category'=>1));
         }
+
+        $store = Mage::app()->getWebsite($this->getListing()->getWebsiteId())->getDefaultStore();
+
         /* @var $collection Mage_Catalog_Model_Resource_Product_Collection */
         $collection = Mage::getResourceModel('catalog/product_collection')
             ->addAttributeToSelect('name')
             ->addAttributeToSelect('sku')
             ->addAttributeToSelect('type_id')
             ->addWebsiteFilter($this->getListing()->getWebsiteId())
+            ->setStoreId($store->getId())
             ->addAttributeToFilter('type_id', array('in' => $this->_helper->getAllowedProductTypes()))
             ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
             //->addFieldToFilter('visibility', array('neq' => Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE ))
@@ -118,7 +122,7 @@ class Diglin_Ricento_Block_Adminhtml_Products_Listing_Edit_Tabs_Products_Add
             'index'     => 'has_custom_options',
             'sortable'  => false,
             'filter'    => false,
-            'renderer'  => Mage::getConfig()->getBlockClassName('diglin_ricento/adminhtml_products_listing_edit_tabs_products_renderer_customoptions')
+            'renderer'  => Mage::getConfig()->getBlockClassName('diglin_ricento/adminhtml_products_listing_edit_renderer_customoptions')
         ));
         $this->addColumn('sku', array(
             'header'    => Mage::helper('catalog')->__('SKU'),

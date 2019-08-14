@@ -95,8 +95,7 @@ class Api implements ApiInterface
             CURLOPT_POSTFIELDS => $this->jsonEncode($params),
             CURLOPT_HTTPHEADER => $this->_addHeaders(),
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSLVERSION => 0,
-            CURLOPT_SSL_CIPHER_LIST => 'TLSv1'
+            CURLOPT_SSLVERSION => 0
         );
 
         $ch = curl_init();
@@ -128,9 +127,11 @@ class Api implements ApiInterface
 
             if ($this->getConfig()->getLogFilePath()) {
                 $dir = dirname($this->getConfig()->getLogFilePath());
-                @mkdir($dir, 0775);
+                if (!is_dir($dir)) {
+                    @mkdir($dir, 0775);
+                }
                 if (is_writable($dir . DIRECTORY_SEPARATOR)) {
-                    file_put_contents($this->getConfig()->getLogFilePath(), print_r($this->_lastDebug, true), FILE_APPEND);
+                    file_put_contents($this->getConfig()->getLogFilePath(), print_r($this->_lastDebug, true) . "\n", FILE_APPEND);
                 }
             }
         }
