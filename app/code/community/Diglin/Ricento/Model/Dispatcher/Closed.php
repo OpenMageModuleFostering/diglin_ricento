@@ -16,6 +16,7 @@ use \Diglin\Ricardo\Managers\SellerAccount\Parameter\OpenArticlesParameter;
  */
 class Diglin_Ricento_Model_Dispatcher_Closed extends Diglin_Ricento_Model_Dispatcher_Abstract
 {
+    const SLEEP_REACTIVATION_TIME = 900; // 15 min in sec
     /**
      * @var int
      */
@@ -103,7 +104,14 @@ class Diglin_Ricento_Model_Dispatcher_Closed extends Diglin_Ricento_Model_Dispat
         /**
          * Status of the collection must be the same as Diglin_Ricento_Model_Resource_Products_Listing_Item::countReadyTolist
          */
-        $itemCollection = $this->_getItemCollection(array(Diglin_Ricento_Helper_Data::STATUS_LISTED, Diglin_Ricento_Helper_Data::STATUS_SOLD), $this->_currentJobListing->getLastItemId());
+        $itemCollection = $this->_getItemCollection(
+            array(
+                Diglin_Ricento_Helper_Data::STATUS_LISTED,
+                Diglin_Ricento_Helper_Data::STATUS_SOLD
+            ),
+            $this->_currentJobListing->getLastItemId()
+        );
+
         $itemCollection->addFieldToFilter('is_planned', 0);
 
         $totalItems = $itemCollection->getSize();
@@ -123,7 +131,7 @@ class Diglin_Ricento_Model_Dispatcher_Closed extends Diglin_Ricento_Model_Dispat
         try {
             $openArticlesParameter = new OpenArticlesParameter();
             $openArticlesParameter
-                ->setPageSize($this->_limit) // if not defined, default is 10
+                ->setPageSize($this->_limit) // if not defined, default is 10, currently is 200
                 ->setArticleIdsFilter($ricardoArticleIds);
 
             $openArticlesResult = $sellerAccountService->getOpenArticles($openArticlesParameter);
@@ -144,21 +152,42 @@ class Diglin_Ricento_Model_Dispatcher_Closed extends Diglin_Ricento_Model_Dispat
 
                 foreach ($itemCollection->getItems() as $item) {
 
-                    try {
-                        // Check if the article is really stopped - Article Id may change if product has been sold but reactivated
-                        $openArticlesParameter = new OpenArticlesParameter();
-                        $openArticlesParameter->setInternalReferenceFilter($item->getInternalReference());
+                    /**
+                     * Close Articles when:
+                     * - sales option "until sold" is enabled + qty_inventory < 1
+                     * - number of reactivation has been reached (date published * number_reaction * duration in days) - not implemented here
+                     * - all is sold
+                     * - Not found as openArticle (cause of manual stop on ricardo side or due to a moment where the reactivation break openArticle )
+                     *
+                     * Warning: article ID may change between reactivation (e.g. if some articles are sold), there is also a phase where articles in reactivation
+                     * are not visible in getOpenArticles
+                     */
 
-                        $openArticleResult = $sellerAccountService->getOpenArticles($openArticlesParameter);
-                    } catch (Exception $e) {
-                        $this->_handleException($e);
-                        $e = null;
+                    $stopIt = false;
+                    if ($item->getQtyInventory() <= 0) {
+                        $stopIt = true;
+                    } else if ($item->getSalesOptions()->getScheduleReactivation() == Diglin_Ricento_Model_Config_Source_Sales_Reactivation::SOLDOUT
+                        && $item->getQtyInventory() > 0) { // drawback with this solution: manual stop on ricardo side are not took in account
                         continue;
-                        // keep going for the next item - no break
+                    }
+
+                    if (!$stopIt) {
+                        try {
+                            // Check if the article is really stopped - Article Id may change if product has been sold but reactivated
+                            $openArticlesParameter = new OpenArticlesParameter();
+                            $openArticlesParameter->setInternalReferenceFilter($item->getInternalReference());
+
+                            $openArticleResult = $sellerAccountService->getOpenArticles($openArticlesParameter);
+                        } catch (Exception $e) {
+                            $this->_handleException($e);
+                            $e = null;
+                            continue;
+                            // keep going for the next item - no break
+                        }
                     }
 
                     // We do not stop anything if the article ID has just been changed and the product is still open
-                    if (isset($openArticleResult['TotalLines']) && $openArticleResult['TotalLines'] > 0) {
+                    if (!$stopIt && isset($openArticleResult['TotalLines']) && $openArticleResult['TotalLines'] > 0) {
                         $articleId = $openArticleResult['OpenArticles'][0]['ArticleId'];
                         if ($item->getRicardoArticleId() != $articleId) {
                             $item
@@ -166,6 +195,14 @@ class Diglin_Ricento_Model_Dispatcher_Closed extends Diglin_Ricento_Model_Dispat
                                 ->save();
                         }
                     } else {
+                        /**
+                         * Wait before to stop in case the product is in reactivation phase on ricardo side
+                         * GetOpenArticle may returned something after a period of time
+                         */
+                        if ($this->temporizeReactivationPhase($item)) {
+                            continue;
+                        }
+
                         $item
                             ->setRicardoArticleId(null)
                             ->setQtyInventory(null)
@@ -222,5 +259,51 @@ class Diglin_Ricento_Model_Dispatcher_Closed extends Diglin_Ricento_Model_Dispat
             }
         }
         return $return;
+    }
+
+    /**
+     * Workaround to "sleep" a product which can be in reactivation phase before to stop it definitely if really needed
+     *
+     * @param Diglin_Ricento_Model_Products_Listing_Item $item
+     * @return bool
+     */
+    public function temporizeReactivationPhase(Diglin_Ricento_Model_Products_Listing_Item $item)
+    {
+        $temporizeReactivationPhase = true;
+        $found = false;
+
+        $reactivationFile = Mage::getBaseDir('tmp') . DS . 'ricardo_reactivation.json';
+
+        if (!file_exists($reactivationFile)) {
+            file_put_contents($reactivationFile, '');
+            chmod($reactivationFile, 0777);
+        }
+
+        $reactivationElements = (array) json_decode(file_get_contents($reactivationFile), true);
+
+        foreach ($reactivationElements as $key => $reactivationElement) {
+            if ($reactivationElement['internal_reference'] == $item->getInternalReference()) {
+                $found = true;
+
+                if ($reactivationElement['temporary_reactivation_time'] + self::SLEEP_REACTIVATION_TIME < time()) {
+                    $temporizeReactivationPhase = false;
+                }
+
+                if ($found && !$temporizeReactivationPhase) {
+                    unset($reactivationElements[$key]);
+                }
+            }
+        }
+
+        if (!$found) {
+            $reactivationElements[] = array(
+                'internal_reference' => $item->getInternalReference(),
+                'temporary_reactivation_time' => time()
+            );
+        }
+
+        file_put_contents($reactivationFile, json_encode($reactivationElements));
+
+        return $temporizeReactivationPhase;
     }
 }

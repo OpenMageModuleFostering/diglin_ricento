@@ -154,7 +154,8 @@ class Diglin_Ricento_Model_Observer
 
             if (!empty($label)) {
                 $transport->setData(array(
-                    'bid_ids' => (isset($additionalData->ricardo_bid_ids)) ? $additionalData->ricardo_bid_ids : null,
+//                    'bid_ids' => (isset($additionalData->ricardo_bid_ids)) ? $additionalData->ricardo_bid_ids : null,
+                    'article_ids' => (isset($additionalData->ricardo_article_ids)) ? $additionalData->ricardo_article_ids : null,
                     'methods' => $label,
                     'information' => $information));
             }
@@ -235,7 +236,7 @@ class Diglin_Ricento_Model_Observer
         /* @var $collection Mage_Eav_Model_Entity_Collection_Abstract */
         $collection = $observer->getEvent()->getCollection();
         $entity = $collection->getEntity();
-        if (!empty($entity) && $entity->getType() == 'customer') {
+        if (!empty($entity) && $entity instanceof Mage_Eav_Model_Entity_Abstract && $entity->getType() == 'customer') {
             $collection->addAttributeToSelect('ricardo_username');
         }
     }

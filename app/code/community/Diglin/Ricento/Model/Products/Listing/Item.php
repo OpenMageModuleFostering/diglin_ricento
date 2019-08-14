@@ -583,6 +583,7 @@ class Diglin_Ricento_Model_Products_Listing_Item extends Mage_Core_Model_Abstrac
                 if ($imageExtension) {
                     $picture = new ArticlePictureParameter();
                     $picture
+//                        ->setPictureInBase64(base64_encode(file_get_contents($filename)))
                         // we encode in Json to minimize memory consumption
                         ->setPictureBytes(json_encode(array_values(unpack('C*', file_get_contents($filename)))))
                         ->setPictureExtension($imageExtension)
@@ -683,7 +684,10 @@ class Diglin_Ricento_Model_Products_Listing_Item extends Mage_Core_Model_Abstrac
         /**
          * Start Date is mandatory for auction but optional for buy now sales type
          */
-        $articleInformation->setStartDate($helper->getJsonDate($helper->getStartingDate($this)));
+        $startingDate = $helper->getStartingDate($this);
+        if (!is_null($startingDate)) {
+            $articleInformation->setStartDate($helper->getJsonDate($startingDate));
+        }
 
         if ($salesType == Diglin_Ricento_Model_Config_Source_Sales_Type::AUCTION) {
             $articleInformation

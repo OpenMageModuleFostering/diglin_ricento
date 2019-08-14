@@ -22,6 +22,10 @@ namespace Diglin\Ricardo\Managers\Sell\Parameter;
 
 use Diglin\Ricardo\Managers\ParameterAbstract;
 
+/**
+ * Class ArticlePictureParameter
+ * @package Diglin\Ricardo\Managers\Sell\Parameter
+ */
 class ArticlePictureParameter extends ParameterAbstract
 {
     /**
@@ -41,10 +45,16 @@ class ArticlePictureParameter extends ParameterAbstract
      */
     protected $_pictureIndex; // required
 
+    /**
+     * @var string
+     */
+    protected $_pictureInBase64; // required
+
     protected $_requiredProperties = array(
         'pictureBytes',
         'pictureExtension',
-        'pictureIndex'
+        'pictureIndex',
+        'pictureInBase64'
     );
 
     /**
@@ -99,5 +109,24 @@ class ArticlePictureParameter extends ParameterAbstract
     public function getPictureIndex()
     {
         return $this->_pictureIndex;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPictureInBase64()
+    {
+        return $this->_pictureInBase64;
+    }
+
+    /**
+     * @param string $pictureInBase64
+     * @return $this
+     */
+    public function setPictureInBase64($pictureInBase64)
+    {
+        $this->_pictureInBase64 = $pictureInBase64;
+        $this->setPictureBytes(null);
+        return $this;
     }
 }
