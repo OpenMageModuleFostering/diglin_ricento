@@ -14,9 +14,9 @@ use \Diglin\Ricardo\Exceptions\SearchException;
 use \Diglin\Ricardo\Enums\SearchErrors;
 
 /**
- * Class Diglin_Ricento_Adminhtml_Products_CategoryController
+ * Class Diglin_Ricento_Adminhtml_Ricento_Products_CategoryController
  */
-class Diglin_Ricento_Adminhtml_Products_CategoryController extends Diglin_Ricento_Controller_Adminhtml_Action
+class Diglin_Ricento_Adminhtml_Ricento_Products_CategoryController extends Diglin_Ricento_Controller_Adminhtml_Action
 {
     public function mappingAction()
     {
@@ -94,7 +94,7 @@ class Diglin_Ricento_Adminhtml_Products_CategoryController extends Diglin_Ricent
                 ->setCategoryId($categoryId)
                 ->setContent($block->toHtml())
                 ->setLevels($block->getLevels()) // must be after $block->toHtml()
-                ->setChildrenUrl($this->getUrl('ricento/products_category/children', array('id' => '#ID#', 'level' => '#LVL#')));
+                ->setChildrenUrl($this->getUrl('*/ricento_products_category/children', array('id' => '#ID#', 'level' => '#LVL#')));
         }
 
         $this->_getSession()->setData('suggested_categories', $suggestedCategoriesId);
@@ -144,13 +144,13 @@ class Diglin_Ricento_Adminhtml_Products_CategoryController extends Diglin_Ricent
     {
         if (!$this->_initListing()) {
             $this->_getSession()->addError($this->__('Product(s) from the selected categories cannot be saved. The products listing doesn\'t exists.'));
-            $this->_redirect('*/products_listing/index');
+            $this->_redirect('*/ricento_products_listing/index');
             return;
         }
 
         if (!$this->_savingAllowed()) {
             $this->_getSession()->addError($this->__('You are not allowed to save the products listing, so you cannot add products from a category.'));
-            $this->_redirect('*/products_listing/index');
+            $this->_redirect('*/ricento_products_listing/index');
             return;
         }
 
@@ -202,14 +202,14 @@ class Diglin_Ricento_Adminhtml_Products_CategoryController extends Diglin_Ricent
             }
 
             $this->_prepareConfigurableProduct();
-//            $this->_warmupPictures();
+            $this->_warmupPictures();
 
             $this->_getSession()->addSuccess($this->__('%d product(s) added to the listing', $productsAdded));
         } catch (Exception $e) {
             Mage::logException($e);
             $this->_getSession()->addError($this->__('Error occurred while saving the product(s) from the selected categories. Please check your exception log.'));
         }
-        $this->_redirect('*/products_listing/edit', array('id' => $this->_getListing()->getId()));
+        $this->_redirect('*/ricento_products_listing/edit', array('id' => $this->_getListing()->getId()));
     }
 
     /**

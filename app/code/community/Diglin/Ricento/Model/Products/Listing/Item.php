@@ -553,18 +553,22 @@ class Diglin_Ricento_Model_Products_Listing_Item extends Mage_Core_Model_Abstrac
         foreach ($images as $image) {
 
             $filename = $image['filepath'];
-//            if (isset($image['filepath'])) {
-//                $filename = Mage::helper('diglin_ricento/image')->prepareRicardoPicture($image['filepath']);
-//            }
-//            if (!$filename) {
-//                continue;
-//            }
+            if (!empty($filename)) {
+                try {
+                    $filename = Mage::helper('diglin_ricento/image')->prepareRicardoPicture($filename);
+                } catch (Exception $e) {
+                    Mage::logException($e);
+                    $filename = null;
+                }
+            }
+
+            if (!$filename) {
+                continue;
+            }
 
             if ($filename == 'no_selection') {
                 continue;
             }
-
-            $filename = Mage::helper('diglin_ricento/image')->init(new Mage_Catalog_Model_Product(), 'image', $filename);
 
             if ($i >= 10) { // Do not set more than 10 pictures
                 break;
@@ -825,7 +829,7 @@ class Diglin_Ricento_Model_Products_Listing_Item extends Mage_Core_Model_Abstrac
         $articleFeeParameter = new GetArticleFeeParameter();
         $articleFeeParameter
             ->setArticleCondition($this->getProductCondition())
-            ->setCategoryId($this->getCategory())
+            ->setCategoryId(Diglin_Ricento_Model_Products_Category_Mapping::ROOT_CATEGORY_ID)
             ->setExcludeListingFees($excludeListingFees)
             ->setInitialQuantity($this->getProductQty())
             ->setPictureCount(0) //@todo check if it is really relevant to send this information as we save some computation, there is no influence on final price

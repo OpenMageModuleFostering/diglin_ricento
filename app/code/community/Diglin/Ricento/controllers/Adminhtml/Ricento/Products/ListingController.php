@@ -10,9 +10,9 @@
  */
 
 /**
- * Class Diglin_Ricento_Adminhtml_Products_ListingController
+ * Class Diglin_Ricento_Adminhtml_Ricento_Products_ListingController
  */
-class Diglin_Ricento_Adminhtml_Products_ListingController extends Diglin_Ricento_Controller_Adminhtml_Products_Listing
+class Diglin_Ricento_Adminhtml_Ricento_Products_ListingController extends Diglin_Ricento_Controller_Adminhtml_Products_Listing
 {
     /**
      * @var string
@@ -108,6 +108,9 @@ class Diglin_Ricento_Adminhtml_Products_ListingController extends Diglin_Ricento
         } catch (Diglin_Ricento_Exception $e) {
             $this->_getSession()->addError($this->__('The action you try to do, is not possible. You must authorize the API token. Please, go the <a href="%s">ricardo.ch Authorization</a> page to do the authorization process', $e->getValidationUrl()));
             $this->_redirectUrl($this->_getIndexUrl());
+        } catch (Exception $e) {
+            $this->_getSession()->addError($e->getMessage());
+            $this->_redirectUrl($this->_getIndexUrl());
         }
     }
 
@@ -193,7 +196,7 @@ class Diglin_Ricento_Adminhtml_Products_ListingController extends Diglin_Ricento
                 $listing->save();
                 if ($this->saveConfiguration($data)) {
                     $this->_prepareConfigurableProduct();
-//                    $this->_warmupPictures();
+                    $this->_warmupPictures();
                     $this->_getSession()->addSuccess($this->__('The listing has been saved.'));
                 } else {
                     $error = true;
@@ -292,7 +295,7 @@ class Diglin_Ricento_Adminhtml_Products_ListingController extends Diglin_Ricento
         }
 
         $this->_prepareConfigurableProduct();
-//        $this->_warmupPictures();
+        $this->_warmupPictures();
 
         $this->_getSession()->addSuccess($this->__('%d product(s) added to the listing', $productsAdded));
         $this->_redirect('*/*/edit', array('id' => $this->_getListing()->getId()));
@@ -366,7 +369,7 @@ class Diglin_Ricento_Adminhtml_Products_ListingController extends Diglin_Ricento
 
             if ($collection->count() > 0) {
                 $this->_getSession()->addNotice($this->__('A similar job is already running. This job won\'t be executed.'));
-                $this->_redirect('*/products_listing/edit', array('id' => $productListing->getId()));
+                $this->_redirect('*/ricento_products_listing/edit', array('id' => $productListing->getId()));
                 return;
             }
 
@@ -389,7 +392,7 @@ class Diglin_Ricento_Adminhtml_Products_ListingController extends Diglin_Ricento
                 ->save();
 
             $this->_getSession()->addSuccess($this->_successMessage);
-            $this->_redirect('*/log/sync', array('id' => $job->getId()));
+            $this->_redirect('*/ricento_log/sync', array('id' => $job->getId()));
             return;
         } catch (Diglin_Ricento_Exception $e) {
             Mage::logException($e);
