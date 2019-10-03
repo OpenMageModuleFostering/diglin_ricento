@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/diglin_ricento",
+    "name": "OpenMageModuleFostering\/diglin_ricento",
     "type": "magento-module",
     "license": "OSL-v3.0",
     "homepage": "",
     "description": "Sell your products from Magento to ricardo.ch and sync your order back into your shop to treat them.",
     "authors": [
-    {
-        "name": "diglin",
-        "email": "sly@diglin.com"
-    }
-],
+        {
+            "name": "diglin",
+            "email": "sly@diglin.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
